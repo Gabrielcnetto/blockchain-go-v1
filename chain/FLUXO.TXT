@@ -1,0 +1,8 @@
+Disco:
+  senha → descriptografa → private key
+
+Memória:
+  private → public → address
+
+Blockchain:
+  address → saldo / estado
