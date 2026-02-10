@@ -1,4 +1,4 @@
-package account
+package chain
 
 import (
 	"app/clients"
@@ -17,7 +17,7 @@ O processo de persistência da conta
 	3)Escreva o par de chaves criptografadas em um arquivo com acesso restrito.
 */
 //função gerente da persistencia
-func (a *account) Persistence_account(password []byte) error {
+func (a *Account) Persistence_account(password []byte) error {
 	// inicia o DB
 	DB, err := clients.StartBadger()
 	if err != nil {

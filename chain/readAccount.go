@@ -1,4 +1,4 @@
-package account
+package chain
 
 import (
 	"app/clients"
@@ -12,18 +12,18 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-func ReadAccount(password []byte, address []byte) (account, error) {
+func ReadAccount(password []byte, address []byte) (Account, error) {
 	//precisamos receber o endereço, pra conseguir gerar
 	AccountFromDb, err := GetAcountFromDb(address)
 	if err != nil {
-		return account{}, err
+		return Account{}, err
 	}
 	bitPrivateKey, err := decryptWithPassword(AccountFromDb, password)
 	if err != nil {
-		return account{}, err
+		return Account{}, err
 	}
 	privKey := reacreatePrivate(bitPrivateKey)
-	return account{
+	return Account{
 		prv:  privKey,
 		addr: Address(address),
 	}, nil
