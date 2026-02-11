@@ -1,0 +1,34 @@
+a ideia é gerar a saida de um endereço, para outro endereço
+para confirmar a saida, precisamos assinar.
+
+Varias transacoes em 1 bloco
+
+que sao salvos no nó principal da blockchain
+
+Nonce:
+Nonce fica atrelado a conta
+quando inicia uma transacao, pega o nounce da conta e atrela ele a transação que ta sendo criada
+Sua carteira 0xABC nunca usou nonce antes:
+
+Sua primeira transação deve ter nonce = 0
+
+Sua segunda transação deve ter nonce = 1
+
+Sua terceira transação deve ter nonce = 2
+
+
+ARVORE DE MARKLE
+Imagine um bloco com 10.000 transações. Como provar que uma 
+transação específica está nesse bloco sem precisar baixar todas as 10.000?
+
+Solução da Merkle Tree:
+Cada transação tem seu hash único (como um RG da transação)
+
+Os hashes são organizados em pares e "hasheados" juntos, formando uma árvore
+
+Só a raiz da árvore (Merkle Root) vai no cabeçalho do bloco
+
+
+**no caso dai ao inves de ir pelos 10k verificando, 
+pelo hash da transacao sabe qual galho 
+que ta e vai abrindo os nós até chegar nele,
