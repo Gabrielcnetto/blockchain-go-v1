@@ -267,3 +267,15 @@ func (a *Account) SignTx(tx Tx) (SigTx, error) {
 	NewTx := NewSig(tx, assinatura)
 	return NewTx, nil
 }
+
+//assinando o bloco genesis
+
+func (a *Account) SigGenesis(gen Genesis) (SigGenesis, error) {
+	hash := gen.Hash()
+	sig, err := ecc.SignBytes(a.prv, hash[:], ecc.LowerS|ecc.RecID)
+	if err != nil {
+		return SigGenesis{}, err
+	}
+	sigGen := NewSigGenesis(gen, sig)
+	return sigGen, nil
+}

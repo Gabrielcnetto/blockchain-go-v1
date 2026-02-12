@@ -1,0 +1,41 @@
+package chain
+
+import (
+	"fmt"
+	"testing"
+)
+
+func Test_create_genesis(t *testing.T) {
+	//acount pq precisaremos assinar
+	pass := "Senha"
+	key := []byte(from)
+	account, err := ReadAccount([]byte(pass), key)
+	if err != nil {
+		t.Error("error to get chain account:", err.Error())
+		return
+	}
+	not_sig_gen := NewGenesis(Address(from), 100, "chain")
+	sigGen, err := account.SigGenesis(not_sig_gen)
+	if err != nil {
+		t.Error("Error to sign new genesis:", err.Error())
+		return
+	}
+	fmt.Println("sigGen:", sigGen)
+	state, err := VerifyGenesis(sigGen)
+	if err != nil {
+		t.Error("error to verify sign genesis:", err)
+		return
+	}
+	if !state {
+		t.Error("state false")
+		return
+	}
+	//salvar chain
+	stateSave := sigGen.SaveGenesis()
+	if stateSave != nil {
+		t.Error("error to verify state save from blockchain:", stateSave.Error())
+		return
+	}
+	fmt.Println("Genesis created with sucessfully!")
+
+}

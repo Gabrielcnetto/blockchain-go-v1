@@ -22,11 +22,11 @@ func Test_CreateAccount(t *testing.T) {
 
 /*
 endereço para testes:
-5ba289b463a8638e1c5ae72f8d7ff309ea5bf8c0dcb4b6f93041026a46ed94f3
+9795d272d608c55aa4195e61c7cfc31197d85879676588bf12bf024e98ea6645
 */
 func Test_ReadAccount(t *testing.T) {
 	pass := "Senha"
-	userAddr := "5ba289b463a8638e1c5ae72f8d7ff309ea5bf8c0dcb4b6f93041026a46ed94f3"
+	userAddr := "9795d272d608c55aa4195e61c7cfc31197d85879676588bf12bf024e98ea6645"
 	key := []byte(userAddr)
 
 	Account, err := ReadAccount([]byte(pass), key)
