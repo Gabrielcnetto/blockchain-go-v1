@@ -256,18 +256,6 @@ func CriptografarKeyPair_mais_senha(pass []byte, keypayrEncoded []byte) ([]byte,
 	return data, nil
 }
 
-//assinar uma transação
-
-func (a *Account) SignTx(tx Tx) (SigTx, error) {
-	hash := tx.Hash()
-	assinatura, err := ecc.SignBytes(a.prv, hash[:], ecc.LowerS|ecc.RecID)
-	if err != nil {
-		return SigTx{}, err
-	}
-	NewTx := NewSig(tx, assinatura)
-	return NewTx, nil
-}
-
 //assinando o bloco genesis
 
 func (a *Account) SigGenesis(gen Genesis) (SigGenesis, error) {

@@ -1,10 +1,13 @@
 package chain
 
 import (
+	"app/clients"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/dustinxie/ecc"
 )
 
@@ -37,6 +40,33 @@ func NewBlock(transactions []SigTx, numberBLock uint64, parent Hash) (Block, err
 }
 func (b *Block) BlockToHash() Hash {
 	return NewHash(b)
+}
+func Coinbase(addr Address, pass []byte) (*SigBlock, error) {
+	account, err := ReadAccount(pass, []byte(addr))
+	if err != nil {
+		return nil, err
+	}
+	tx := Tx{
+		From:  addr,
+		To:    addr,
+		Value: 1500,
+		Nonce: 1,
+		Time:  time.Now(),
+	}
+	sigTx, err := account.SignTx(tx)
+	if err != nil {
+		return nil, err
+	}
+	block, err := NewBlock([]SigTx{sigTx}, 1, NewHash(nil))
+	if err != nil {
+		return nil, err
+	}
+	NewSiggBlock, err := account.SignBlock(block)
+	if err != nil {
+		return nil, err
+	}
+	return &NewSiggBlock, nil
+
 }
 
 //agora, vamos ter o block assinado que é o bloco realmente atribuido a rede
@@ -95,4 +125,47 @@ func VerifyBlock(blk SigBlock, authority Address) (bool, error) {
 	}
 	acc := New_address(publicKey)
 	return acc == authority, nil
+}
+
+func GetBlock(txn *badger.Txn) (*SigBlock, int, error) {
+	fmt.Println("Entrei auqi")
+	item, err := txn.Get([]byte("block"))
+	if err == badger.ErrKeyNotFound {
+		return nil, 0, err
+	}
+	var SigBlock SigBlock
+	err = item.Value(func(val []byte) error {
+		savedByte := append([]byte{}, val...)
+		if err := json.Unmarshal(savedByte, &SigBlock); err != nil {
+			return err
+		}
+		return nil
+	})
+	return &SigBlock, 1, err
+}
+
+func SaveBlock(sigBlock SigBlock) error {
+	db, err := clients.StartBadger()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	err = db.Update(func(txn *badger.Txn) error {
+		parentBlock, state, err := GetBlock(txn)
+		switch state {
+		case 0:
+			byteBlock, _ := json.Marshal(sigBlock)
+			return txn.Set([]byte("block"), byteBlock)
+		case 1:
+			sigBlock.Parent = parentBlock.BlockToHash()
+			byteBlock, _ := json.Marshal(sigBlock)
+			err := txn.Set([]byte("block"), byteBlock)
+			return err
+		default:
+			return err
+		}
+
+	})
+	return err
 }

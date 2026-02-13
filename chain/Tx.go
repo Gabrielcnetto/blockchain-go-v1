@@ -13,6 +13,9 @@ import (
 type Hash [32]byte
 
 func NewHash(val any) Hash {
+	if val == nil {
+		return Hash{}
+	}
 	byte_val, _ := json.Marshal(val)
 	//instancia a ferramenta que cria hash
 	state := sha3.NewLegacyKeccak256()
@@ -127,4 +130,16 @@ func VerifyTx(sigTx SigTx) (bool, error) {
 	}
 	accountAddr := New_address(data) //1 pub sempre gera a mesma saída
 	return accountAddr == sigTx.From, nil
+}
+
+//assinar uma transação
+
+func (a *Account) SignTx(tx Tx) (SigTx, error) {
+	hash := tx.Hash()
+	assinatura, err := ecc.SignBytes(a.prv, hash[:], ecc.LowerS|ecc.RecID)
+	if err != nil {
+		return SigTx{}, err
+	}
+	NewTx := NewSig(tx, assinatura)
+	return NewTx, nil
 }
