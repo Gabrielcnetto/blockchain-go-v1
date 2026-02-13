@@ -73,6 +73,10 @@ func NewSig(tx Tx, sig []byte) SigTx {
 	}
 }
 
+func SigTxToHash(tx SigTx) Hash {
+	return NewHash(tx)
+}
+
 // a assinatura assinada tmb gera um hash dela
 func (s *SigTx) Hash() Hash {
 	return NewHash(s)
