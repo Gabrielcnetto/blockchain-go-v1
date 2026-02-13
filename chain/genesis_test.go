@@ -39,3 +39,14 @@ func Test_create_genesis(t *testing.T) {
 	fmt.Println("Genesis created with sucessfully!")
 
 }
+
+func Test_readGenesis(t *testing.T) {
+	chain, err := ReadGenesis()
+	if err != nil {
+		t.Error("Error to read genesis:", err.Error())
+	}
+	fmt.Println("authority:", chain.Authority)
+	fmt.Println("balances:", chain.Balances)
+	fmt.Println("Sucess to get blockchain")
+	fmt.Println("___________________-")
+}

@@ -89,8 +89,8 @@ func (g *SigGenesis) SaveGenesis() error {
 		stateChain := VerifyChainExist(txn)
 		if !stateChain {
 			//gerar com a genesis
-			hashed_chain := g.Hash()
-			return txn.Set([]byte("chain"), hashed_chain[:])
+			genesis, _ := json.Marshal(g)
+			return txn.Set([]byte("chain"), genesis)
 		} else {
 			return fmt.Errorf("Genesis ja definido")
 		}
@@ -104,4 +104,33 @@ func (g *SigGenesis) SaveGenesis() error {
 func ChainByte(sig *SigGenesis) []byte {
 	sigByte, _ := json.Marshal(sig)
 	return sigByte
+}
+
+func ReadGenesis() (SigGenesis, error) {
+	db, err := clients.StartBadger()
+	if err != nil {
+		return SigGenesis{}, err
+	}
+	defer db.Close()
+	var gen SigGenesis
+	err = db.View(func(txn *badger.Txn) error {
+		stateChain := VerifyChainExist(txn)
+		if !stateChain {
+			return fmt.Errorf("chain not created")
+		}
+		item, err := txn.Get([]byte("chain"))
+		if err != nil {
+			return err
+		}
+		err = item.Value(func(val []byte) error {
+			fmt.Println("Item pego:", val)
+			data := append([]byte{}, val...)
+			if err := json.Unmarshal(data, &gen); err != nil {
+				return nil
+			}
+			return nil
+		})
+		return err
+	})
+	return gen, err
 }

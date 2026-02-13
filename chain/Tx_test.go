@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var from = "88866fdf92974636dd3383f8f0544ba02b9050bed143a7bfafc2f50cdd8d1f34"
+var from = "3591f0a62b229788301c315a8daefbac8cd69fd478e46f02b5703532a489ecb9"
 var to = "9426f0773c4169f388e1680cd2d6af6ddd800df3bdae1e8c44118338301ae948"
 
 func Test_newTx(t *testing.T) {
