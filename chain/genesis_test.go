@@ -20,7 +20,6 @@ func Test_create_genesis(t *testing.T) {
 		t.Error("Error to sign new genesis:", err.Error())
 		return
 	}
-	fmt.Println("sigGen:", sigGen)
 	state, err := VerifyGenesis(sigGen)
 	if err != nil {
 		t.Error("error to verify sign genesis:", err)
@@ -31,7 +30,7 @@ func Test_create_genesis(t *testing.T) {
 		return
 	}
 	//salvar chain
-	stateSave := sigGen.SaveGenesis()
+	stateSave := sigGen.SaveGenesis([]byte(pass))
 	if stateSave != nil {
 		t.Error("error to verify state save from blockchain:", stateSave.Error())
 		return

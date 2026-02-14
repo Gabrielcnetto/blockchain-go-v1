@@ -128,7 +128,7 @@ func VerifyBlock(blk SigBlock, authority Address) (bool, error) {
 }
 
 func GetBlock(txn *badger.Txn) (*SigBlock, int, error) {
-	fmt.Println("Entrei auqi")
+
 	item, err := txn.Get([]byte("block"))
 	if err == badger.ErrKeyNotFound {
 		return nil, 0, err
@@ -153,19 +153,48 @@ func SaveBlock(sigBlock SigBlock) error {
 
 	err = db.Update(func(txn *badger.Txn) error {
 		parentBlock, state, err := GetBlock(txn)
+		fmt.Println("state pego:", state)
 		switch state {
 		case 0:
 			byteBlock, _ := json.Marshal(sigBlock)
+			fmt.Println("sucess with 0 status")
 			return txn.Set([]byte("block"), byteBlock)
 		case 1:
 			sigBlock.Parent = parentBlock.BlockToHash()
 			byteBlock, _ := json.Marshal(sigBlock)
 			err := txn.Set([]byte("block"), byteBlock)
+			fmt.Println("sucess with 1 status")
 			return err
 		default:
+			fmt.Println("error default error")
 			return err
 		}
 
 	})
 	return err
+}
+
+func ReadBlock() (SigBlock, error) {
+	db, err := clients.StartBadger()
+	if err != nil {
+		return SigBlock{}, err
+	}
+	defer db.Close()
+	var _block *SigBlock
+	err = db.View(func(txn *badger.Txn) error {
+		block, state, err := GetBlock(txn)
+		switch state {
+		case 0:
+			return fmt.Errorf("Block not exist")
+		case 1:
+			_block = block
+			return nil
+		default:
+			return err
+		}
+	})
+	if err != nil {
+		return SigBlock{}, err
+	}
+	return *_block, nil
 }

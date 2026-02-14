@@ -79,18 +79,26 @@ func VerifyChainExist(txn *badger.Txn) bool {
 
 }
 
-func (g *SigGenesis) SaveGenesis() error {
+func (g *SigGenesis) SaveGenesis(pass []byte) error {
 	db, err := clients.StartBadger()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
+
+	if err != nil {
+		return err
+	}
 	err = db.Update(func(txn *badger.Txn) error {
 		stateChain := VerifyChainExist(txn)
 		if !stateChain {
-			//gerar com a genesis
+
 			genesis, _ := json.Marshal(g)
-			return txn.Set([]byte("chain"), genesis)
+			err := txn.Set([]byte("chain"), genesis)
+			coinBase, err := Coinbase(g.Authority, pass)
+			byteBlock, _ := json.Marshal(coinBase)
+			err = txn.Set([]byte("block"), byteBlock)
+			return err
 		} else {
 			return fmt.Errorf("Genesis ja definido")
 		}
